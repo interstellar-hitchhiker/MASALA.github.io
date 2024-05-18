@@ -40,7 +40,7 @@ Welcome to the MASALA: IBDP Exam Scheduler! This tool is designed to help you sc
 
 ## GitHub Pages Site
 
-You can view and interact with the MASALA: IBDP Exam Scheduler directly on our GitHub Pages site: [https://<your-username>.github.io/](https://<your-username>.github.io/)
+You can view and interact with the MASALA: IBDP Exam Scheduler directly here: https://interstellar-hitchhiker.github.io/MASALA/
 
 ## Installation
 
