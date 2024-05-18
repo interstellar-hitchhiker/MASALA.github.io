@@ -68,7 +68,7 @@
         }
         #scheduleView, #finalizedView {
             display: none;
-            width: 100%; /* Updated width to 100% */
+            width: 100%;
         }
         table {
             width: 90%;
@@ -88,12 +88,27 @@
         th, td {
             padding: 10px;
             border: 1px solid #dee2e6;
+            color: #000; /* Ensure text color is black */
         }
         .card-title {
             font-size: 2rem;
             font-weight: bold;
             text-align: center;
             color: #333;
+        }
+        .sticky-col {
+            position: -webkit-sticky;
+            position: sticky;
+            left: 0;
+            background-color: #007bff;
+            color: white;
+            z-index: 1;
+        }
+        .sticky-col-content {
+            background-color: #fff;
+            border-left: 1px solid #dee2e6;
+            color: #000; /* Ensure text color is black */
+            z-index: 1;
         }
     </style>
     <script>
@@ -129,18 +144,19 @@
             tableArea.innerHTML = "";
             let tableHTML = `
                 <div class="mt-3">
-                    <table class='table table-bordered table-hover table-striped'>
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>${examDate}</th>`;
+                    <div style="overflow-x:auto;">
+                        <table class='table table-bordered table-hover table-striped'>
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th class="sticky-col">Exam Date: ${examDate}</th>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 tableHTML += `<th contenteditable='true' class='placeholder' onfocus="this.classList.remove('placeholder')" onblur="if(this.innerText === '') { this.innerText='e.g. English B Paper 1 HL'; this.classList.add('placeholder'); }">e.g. English B Paper 1 HL</th>`;
             }
             tableHTML += `
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>Exam Duration</td>`;
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="sticky-col sticky-col-content">Exam Duration</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 tableHTML += `
                     <td>
@@ -148,7 +164,7 @@
                         <input type='number' class='form-control form-control-sm' id='durationMinutes${i}' placeholder='Minutes' min='0' max='60' value='0' onchange='calculateTimes(${i})'> mins
                     </td>`;
             }
-            tableHTML += `</tr><tr><td>Reading Time Allocated</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Reading Time Allocated</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 tableHTML += `
                     <td>
@@ -156,32 +172,32 @@
                         <input type='number' class='form-control form-control-sm' id='readingTime${i}' placeholder='Minutes' min='0' max='20' value='5' onchange='calculateTimes(${i})'>
                     </td>`;
             }
-            tableHTML += `</tr><tr><td>Start Time</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Start Time</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 tableHTML += `<td><input type='time' class='form-control' id='startTime${i}' onchange='calculateTimes(${i})'></td>`;
             }
-            tableHTML += `</tr><tr><td>Reading Period</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Reading Period</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 tableHTML += `<td><div id='readingTimeDisplay${i}'></div></td>`;
             }
-            tableHTML += `</tr><tr><td>30 Mins Remaining</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">30 Mins Remaining</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 tableHTML += `<td><input type='time' class='form-control' id='thirtyMin${i}' readonly></td>`;
             }
-            tableHTML += `</tr><tr><td>5 Mins Remaining</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">5 Mins Remaining</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 tableHTML += `<td><input type='time' class='form-control' id='fiveMin${i}' readonly></td>`;
             }
-            tableHTML += `</tr><tr><td>End</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">End</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 tableHTML += `<td><input type='time' class='form-control' id='endTime${i}' readonly></td>`;
             }
-            tableHTML += `</tr><tr><td>Accommodations (%)</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Accommodations (%)</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 tableHTML += `
                     <td>
                         <input type='checkbox' id='noAccommodations${i}' onchange='toggleAccommodationInput(${i})' checked> N/A
-                        <input type='number' class='form-control form-control-sm' id='accommodations${i}' placeholder='%' min='0' max='100' value='0' onchange='calculateAccommodations(${i})' disabled>
+                        <input type='number' class='form-control form-control-sm' id='accommodations${i}' placeholder='%' min='0' max='100' value='0' onchange='calculateAccommodations(${i})'>
                         <div id='accommodationEndTime${i}'></div>
                     </td>`;
             }
@@ -189,6 +205,7 @@
             <div id="additionalButtons" class="mt-3">
                 <button class="btn btn-primary" onclick="exportToExcel()">Download to Excel</button>
                 <button class="btn btn-finalize ml-2" onclick="displayFinalizedTable()">Finalized Table Web View</button>
+            </div>
             </div>
             `;
 
@@ -269,7 +286,7 @@
                     <table class='table table-bordered table-hover table-striped'>
                         <thead class="thead-dark">
                             <tr>
-                                <th>${examDate}</th>`;
+                                <th class="sticky-col">Exam Date: ${examDate}</th>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 const subject = document.querySelector(`#tableArea th:nth-child(${i + 1})`).innerText.trim();
                 tableHTML += `<th>${subject}</th>`;
@@ -278,44 +295,44 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>Exam Duration</td>`;
+                            <tr><td class="sticky-col sticky-col-content">Exam Duration</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 const durationHours = document.getElementById(`durationHours${i}`).value;
                 const durationMinutes = document.getElementById(`durationMinutes${i}`).value;
                 const duration = `${durationHours > 0 ? durationHours + (durationHours == 1 ? ' hr ' : ' hrs ') : ''}${durationMinutes > 0 ? durationMinutes + ' mins' : ''}`;
                 tableHTML += `<td>${duration}</td>`;
             }
-            tableHTML += `</tr><tr><td>Reading Time Allocated</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Reading Time Allocated</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 const readingTime = document.getElementById(`noReading${i}`).checked ? "N/A" : document.getElementById(`readingTime${i}`).value + " mins";
                 tableHTML += `<td>${readingTime}</td>`;
             }
-            tableHTML += `</tr><tr><td>Start Time</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Start Time</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 const startTime = document.getElementById(`startTime${i}`).value;
                 tableHTML += `<td id='startTime${i}Cell'>${moment(startTime, 'HH:mm').format('HH:mm')}</td>`;
             }
-            tableHTML += `</tr><tr><td>Reading Period</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Reading Period</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 const readingDisplay = document.getElementById(`noReading${i}`).checked ? "N/A" : document.getElementById(`readingTimeDisplay${i}`).innerText;
                 tableHTML += `<td id='readingPeriod${i}Cell'>${readingDisplay}</td>`;
             }
-            tableHTML += `</tr><tr><td>30 Mins Remaining</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">30 Mins Remaining</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 const thirtyMin = document.getElementById(`thirtyMin${i}`).value;
                 tableHTML += `<td id='thirtyMin${i}Cell'>${moment(thirtyMin, 'HH:mm').format('HH:mm')}</td>`;
             }
-            tableHTML += `</tr><tr><td>5 Mins Remaining</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">5 Mins Remaining</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 const fiveMin = document.getElementById(`fiveMin${i}`).value;
                 tableHTML += `<td id='fiveMin${i}Cell'>${moment(fiveMin, 'HH:mm').format('HH:mm')}</td>`;
             }
-            tableHTML += `</tr><tr><td>End</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">End</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 const endTime = document.getElementById(`endTime${i}`).value;
                 tableHTML += `<td id='endTime${i}Cell'>${moment(endTime, 'HH:mm').format('HH:mm')}</td>`;
             }
-            tableHTML += `</tr><tr><td>Accommodations (%)</td>`;
+            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Accommodations (%)</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
                 const accommodations = document.getElementById(`noAccommodations${i}`).checked ? "N/A" : document.getElementById(`accommodationEndTime${i}`).innerText;
                 tableHTML += `<td>${accommodations}</td>`;
@@ -470,7 +487,7 @@
     </script>
 </head>
 <body onload="showScheduleView()">
-    <div id="scheduleView" class="container-fluid"> <!-- Updated container-fluid class for full width -->
+    <div id="scheduleView" class="container-fluid">
         <div class="card">
             <div class="card-body">
                 <h1 class="card-title">MASALA: IBDP Exam Scheduler</h1>
@@ -485,17 +502,17 @@
                     </div>
                 </div>
                 <button class="btn btn-success" onclick="generateSchedule()">Create Schedule Table</button>
-                <div id="tableArea" class="mt-3"></div> <!-- Table area -->
+                <div id="tableArea" class="mt-3"></div>
             </div>
         </div>
     </div>
 
-    <div id="finalizedView" class="container-fluid"> <!-- Updated container-fluid class for full width -->
+    <div id="finalizedView" class="container-fluid">
         <div class="card">
             <div class="card-body">
                 <button class="btn btn-secondary mb-3" onclick="showScheduleView()">Return to Scheduling</button>
-                <div id="clockArea" class="mb-5"></div> <!-- Clock area -->
-                <div id="finalizedTableArea" class="mt-5"></div> <!-- Finalized table area -->
+                <div id="clockArea" class="mb-5"></div>
+                <div id="finalizedTableArea" class="mt-5"></div>
             </div>
         </div>
     </div>
