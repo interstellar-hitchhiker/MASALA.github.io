@@ -3,7 +3,7 @@ MASALA: IBDP Exam Scheduler
 https://interstellar-hitchhiker.github.io/MASALA/
 # MASALA: IBDP Exam Scheduler
 
-Welcome to the MASALA: IBDP Exam Scheduler! This tool is designed to help you schedule and manage your IBDP exams efficiently. The scheduler allows you to create a detailed exam schedule, including exam durations, reading times, start times, and accommodations. The schedule can be exported to an Excel file for easy sharing and printing.
+Welcome to the MASALA: IBDP Exam Scheduler! This tool is designed to help you efficiently schedule and manage your IBDP exams. The scheduler enables you to create a detailed exam schedule, including exam durations, reading times, start times, and accommodations. The schedule can be displayed in a finalized web view or exported to an Excel file for easy sharing, printing, and record-keeping.
 
 ## Features
 
