@@ -13,11 +13,6 @@ Welcome to the MASALA: IBDP Exam Scheduler! This tool is designed to help you ef
 - **Export to Excel**: Download the finalized exam schedule as an Excel file.
 - **Live Time Updates**: Displays a live clock and highlights schedule cells based on the current time.
 
-## Known Issues
-
-- **Reading Period Highlighting**: The reading period time highlights correctly but the highlight turns off after one minute.
-- **Cell Coloring**: The current coloring scheme highlights cells based on time events (start, reading period, 30-minute warning, 5-minute warning, end). Potential enhancements include using complementary colors and adding sound notifications.
-
 ## Potential Changes and Enhancements
 
 - **Color Scheme Update**: Improve the visual appeal by using complementary colors for cell highlighting.
