@@ -13,12 +13,6 @@ Welcome to the MASALA: IBDP Exam Scheduler! This tool is designed to help you ef
 - **Export to Excel**: Download the finalized exam schedule as an Excel file.
 - **Live Time Updates**: Displays a live clock and highlights schedule cells based on the current time.
 
-## Potential Changes and Enhancements
-
-- **Color Scheme Update**: Improve the visual appeal by using complementary colors for cell highlighting.
-- **Sound Notifications**: Add beep noises to indicate start and end times, and when there are 30 minutes or 5 minutes remaining.
-- **Text-to-Speech Announcements**: Implement text-to-speech functionality to announce exam details and time warnings. This feature could be complex when multiple exams are running simultaneously, as it would need to read aloud the exam subject, paper, and levels for each exam. However, this feature is worth exploring.
-
 ## How to Use
 
 1. **Set Exam Date**: Select the date for the exams.
