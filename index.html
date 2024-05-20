@@ -5,8 +5,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
         body {
             padding: 20px;
@@ -160,6 +162,18 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Flatpickr for all timepicker inputs
+            flatpickr('.timepicker', {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                onChange: function(selectedDates, dateStr, instance) {
+                    const index = instance.element.id.match(/\d+/)[0];
+                    calculateTimes(index);
+                }
+            });
+
             const examDateInput = document.getElementById('examDate');
             const today = new Date();
             examDateInput.value = today.toISOString().split('T')[0];
@@ -221,7 +235,7 @@
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Start Time</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<td><input type='time' class='form-control' id='startTime${i}' onchange='calculateTimes(${i})'></td>`;
+                tableHTML += `<td><input type='text' class='form-control timepicker' id='startTime${i}' placeholder="Select Time"></td>`;
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Reading Period</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
@@ -229,15 +243,15 @@
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">30 Mins Remaining</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<td><input type='time' class='form-control' id='thirtyMin${i}' readonly></td>`;
+                tableHTML += `<td><div id='thirtyMin${i}'></div></td>`;
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">5 Mins Remaining</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<td><input type='time' class='form-control' id='fiveMin${i}' readonly></td>`;
+                tableHTML += `<td><div id='fiveMin${i}'></div></td>`;
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">End</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<td><input type='time' class='form-control' id='endTime${i}' readonly></td>`;
+                tableHTML += `<td><div id='endTime${i}'></div></td>`;
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Accommodations (%)</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
@@ -257,6 +271,18 @@
             `;
 
             tableArea.innerHTML = tableHTML;
+
+            // Initialize Flatpickr for newly created inputs
+            flatpickr('.timepicker', {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                onChange: function(selectedDates, dateStr, instance) {
+                    const index = instance.element.id.match(/\d+/)[0];
+                    calculateTimes(index);
+                }
+            });
         }
 
         function updateHrText(index) {
@@ -279,9 +305,9 @@
                 const readingDisplay = document.getElementById(`noReading${index}`).checked ? "N/A" : `${startTime.format('HH:mm')} - ${examStartTime.format('HH:mm')}`;
 
                 document.getElementById(`readingTimeDisplay${index}`).textContent = readingDisplay;
-                document.getElementById(`thirtyMin${index}`).value = thirtyMin;
-                document.getElementById(`fiveMin${index}`).value = fiveMin;
-                document.getElementById(`endTime${index}`).value = endTime.format('HH:mm');
+                document.getElementById(`thirtyMin${index}`).textContent = thirtyMin;
+                document.getElementById(`fiveMin${index}`).textContent = fiveMin;
+                document.getElementById(`endTime${index}`).textContent = endTime.format('HH:mm');
                 
                 // Update accommodation end time if applicable
                 calculateAccommodations(index);
@@ -297,7 +323,7 @@
         }
 
         function calculateAccommodations(index) {
-            const endTime = document.getElementById(`endTime${index}`).value;
+            const endTime = document.getElementById(`endTime${index}`).innerText;
             const accommodationsCheckbox = document.getElementById(`noAccommodations${index}`);
             const accommodations = parseInt(document.getElementById(`accommodations${index}`).value);
             const accommodationEndTime = document.getElementById(`accommodationEndTime${index}`);
@@ -374,18 +400,18 @@
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">30 Mins Remaining</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
-                const thirtyMin = document.getElementById(`thirtyMin${i}`).value;
-                tableHTML += `<td id='thirtyMin${i}Cell'>${moment(thirtyMin, 'HH:mm').format('HH:mm')}</td>`;
+                const thirtyMin = document.getElementById(`thirtyMin${i}`).textContent;
+                tableHTML += `<td id='thirtyMin${i}Cell'>${thirtyMin}</td>`;
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">5 Mins Remaining</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
-                const fiveMin = document.getElementById(`fiveMin${i}`).value;
-                tableHTML += `<td id='fiveMin${i}Cell'>${moment(fiveMin, 'HH:mm').format('HH:mm')}</td>`;
+                const fiveMin = document.getElementById(`fiveMin${i}`).textContent;
+                tableHTML += `<td id='fiveMin${i}Cell'>${fiveMin}</td>`;
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">End</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
-                const endTime = document.getElementById(`endTime${i}`).value;
-                tableHTML += `<td id='endTime${i}Cell'>${moment(endTime, 'HH:mm').format('HH:mm')}</td>`;
+                const endTime = document.getElementById(`endTime${i}`).textContent;
+                tableHTML += `<td id='endTime${i}Cell'>${endTime}</td>`;
             }
             tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Accommodations (%)</td>`;
             for (let i = 1; i <= numberOfExams; i++) {
@@ -413,9 +439,9 @@
                 const startTime = document.getElementById(`startTime${i}`).value;
                 const readingPeriodStart = document.getElementById(`readingTimeDisplay${i}`).dataset.start;
                 const readingPeriodEnd = document.getElementById(`readingTimeDisplay${i}`).dataset.end;
-                const thirtyMin = document.getElementById(`thirtyMin${i}`).value;
-                const fiveMin = document.getElementById(`fiveMin${i}`).value;
-                const endTime = document.getElementById(`endTime${i}`).value;
+                const thirtyMin = document.getElementById(`thirtyMin${i}`).textContent;
+                const fiveMin = document.getElementById(`fiveMin${i}`).textContent;
+                const endTime = document.getElementById(`endTime${i}`).textContent;
                 const accommodationEnd = document.getElementById(`endTime${i}`).dataset.accommodationEnd;
 
                 const startTimeCell = document.getElementById(`startTime${i}Cell`);
@@ -522,13 +548,13 @@
                             value = document.getElementById(`noReading${j}`).checked ? "N/A" : `${startDisplay} - ${endDisplay}`;
                             break;
                         case 4:
-                            value = moment(document.getElementById(`thirtyMin${j}`).value, 'HH:mm').format('HH:mm');
+                            value = moment(document.getElementById(`thirtyMin${j}`).textContent, 'HH:mm').format('HH:mm');
                             break;
                         case 5:
-                            value = moment(document.getElementById(`fiveMin${j}`).value, 'HH:mm').format('HH:mm');
+                            value = moment(document.getElementById(`fiveMin${j}`).textContent, 'HH:mm').format('HH:mm');
                             break;
                         case 6:
-                            value = moment(document.getElementById(`endTime${j}`).value, 'HH:mm').format('HH:mm');
+                            value = moment(document.getElementById(`endTime${j}`).textContent, 'HH:mm').format('HH:mm');
                             break;
                         case 7:
                             value = document.getElementById(`noAccommodations${j}`).checked ? "N/A" : moment(document.getElementById(`accommodationEndTime${j}`).innerText, 'HH:mm').format('HH:mm');
