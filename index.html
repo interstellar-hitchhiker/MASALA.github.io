@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>IBDP Exam Scheduler and Display</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -9,144 +10,183 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPDF/2.3.1/jspdf.umd.min.js"></script>
     <style>
         body {
             padding: 20px;
-            background-color: #f5f5f5; /* Light off-white */
+            background-color: #f5f5f5;
             font-family: 'Roboto', sans-serif;
         }
-        .form-control-inline {
-            display: inline-block;
-            width: auto;
-        }
+
+        .form-control-inline,
         .form-control-sm {
-            width: auto;
             display: inline-block;
+            width: auto;
         }
+
         .placeholder {
             color: lightgray;
         }
+
         .card {
             margin-top: 20px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-            color: #fff;
-            border-radius: 50px;
-        }
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-            color: #fff;
-            border-radius: 50px;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            color: #fff;
-            border-radius: 50px;
-        }
-        .btn-finalize {
-            background-color: #17a2b8;
-            color: white;
-            border-radius: 50px;
-        }
+
         .btn {
             width: auto;
             padding: 10px 20px;
             margin: 5px 0;
+            border-radius: 50px;
+            transition: background-color 0.3s, border-color 0.3s;
         }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: #fff;
+        }
+
+        .btn-secondary-custom {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: #fff;
+        }
+
+        .btn-finalize {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+            color: white;
+        }
+
+        .btn:hover {
+            background-color: darken(#007bff, 10%);
+            border-color: darken(#007bff, 10%);
+        }
+
         #finalizedTableArea {
             margin-top: 30px;
             overflow-x: auto;
             white-space: nowrap;
         }
+
         #clock {
             font-size: 72px;
             text-align: center;
             margin-bottom: 20px;
+            color: #333;
         }
-        #scheduleView, #finalizedView {
+
+        #scheduleView,
+        #finalizedView {
             display: none;
             width: 100%;
         }
+
         table {
-            width: 90%;
+            width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
         }
+
         thead th.sticky-col {
-            background-color: #0056b3; /* Darker blue */
+            background-color: #0056b3;
             color: #fff;
         }
+
         thead th:not(.sticky-col) {
-            background-color: #007acc; /* Medium blue */
+            background-color: #007acc;
             color: #fff;
         }
+
         tbody tr:nth-child(even) {
             background-color: #f8f9fa;
         }
+
         tbody tr:hover {
             background-color: #e9ecef;
         }
-        th, td {
-            padding: 10px;
+
+        th,
+        td {
+            padding: 15px;
             border: 1px solid #dee2e6;
-            color: #000; /* Ensure text color is black */
+            color: #000;
+            text-align: center;
         }
+
         .card-title {
             font-size: 2.5rem;
-            font-family: 'Poppins', sans-serif; /* Title font */
+            font-family: 'Poppins', sans-serif;
             font-weight: 700;
             text-align: center;
             color: #333;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Subtle shadow */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
+
         .form-label {
-            font-weight: 700; /* Increased weight for section headings */
+            font-weight: 700;
         }
+
         .sticky-col {
             position: -webkit-sticky;
             position: sticky;
             left: 0;
-            background-color: #0056b3; /* Darker blue */
+            background-color: #0056b3;
             color: white;
             z-index: 1;
         }
+
         .sticky-col-content {
             background-color: #fff;
             border-left: 1px solid #dee2e6;
-            color: #000; /* Ensure text color is black */
+            color: #000;
             z-index: 1;
         }
-        /* Highlighting colors */
+
         .start-time-cell {
-            background-color: #d4edda; /* Light green */
+            background-color: #d4edda;
         }
+
         .reading-period-cell {
-            background-color: #c3e6cb; /* Complementary green */
+            background-color: #c3e6cb;
         }
+
         .thirty-min-cell {
-            background-color: #ffeeba; /* Light amber */
+            background-color: #ffeeba;
         }
+
         .five-min-cell {
-            background-color: #ffc107; /* Amber */
+            background-color: #ffc107;
         }
+
         .end-time-cell {
-            background-color: #f8d7da; /* Light red */
+            background-color: #f8d7da;
         }
+
         .accommodation-cell {
-            background-color: #fff3cd; /* Light amber */
+            background-color: #fff3cd;
         }
-        /* Greying out */
+
         .greyed-out {
-            background-color: #e0e0e0; /* Complementary grey */
-            color: #6c757d; /* Grey text color */
+            background-color: #e0e0e0;
+            color: #6c757d;
         }
-        /* Read.Me link */
+
         .readme-link {
             position: absolute;
             top: 20px;
@@ -156,28 +196,48 @@
             color: #007bff;
             text-decoration: none;
         }
+
         .readme-link:hover {
             text-decoration: underline;
         }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .card-title {
+                font-size: 2rem;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                margin: 3px 0;
+            }
+        }
     </style>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Flatpickr for all timepicker inputs
+        document.addEventListener('DOMContentLoaded', function () {
             flatpickr('.timepicker', {
                 enableTime: true,
                 noCalendar: true,
                 dateFormat: "H:i",
                 time_24hr: true,
-                onChange: function(selectedDates, dateStr, instance) {
-                    const index = instance.element.id.match(/\d+/)[0];
-                    calculateTimes(index);
+                onChange: function (selectedDates, dateStr, instance) {
+                    calculateTimes(instance.element.id.match(/\d+/)[0]);
                 }
             });
-
             const examDateInput = document.getElementById('examDate');
-            const today = new Date();
-            examDateInput.value = today.toISOString().split('T')[0];
-            examDateInput.addEventListener('change', function() {
+            examDateInput.value = new Date().toISOString().split('T')[0];
+            examDateInput.addEventListener('change', function () {
                 this.blur();
             });
         });
@@ -188,107 +248,117 @@
             const examDate = document.getElementById("examDate").value;
 
             if (isNaN(numberOfExams) || !examDate) {
-                alert("Please enter a valid number of exams and select a date.");
+                displayErrorMessage("Please enter a valid number of exams and select a date.");
                 return;
             }
 
-            if (numberOfExams < 1) {
-                alert("The minimum number of exams is 1. Setting to 1.");
-                document.getElementById("numExams").value = 1;
-                return;
-            } else if (numberOfExams > 20) {
-                alert("The maximum number of exams is 20. Setting to 20.");
+            let errorMessage = "";
+
+            if (numberOfExams > 20) {
+                errorMessage = "The maximum number of exams is 20.";
                 document.getElementById("numExams").value = 20;
+            } else if (numberOfExams < 1) {
+                errorMessage = "The minimum number of exams is 1.";
+                document.getElementById("numExams").value = 1;
+            }
+
+            if (errorMessage) {
+                displayErrorMessage(errorMessage);
                 return;
             }
 
-            tableArea.innerHTML = "";
-            let tableHTML = `
+            tableArea.innerHTML = `
                 <div class="mt-3">
                     <div style="overflow-x:auto;">
                         <table class='table table-bordered table-hover table-striped'>
                             <thead>
                                 <tr>
-                                    <th class="sticky-col">Exam Date: ${examDate}</th>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<th contenteditable='true' class='placeholder' onfocus="this.classList.remove('placeholder')" onblur="if(this.innerText === '') { this.innerText='e.g. English B Paper 1 HL'; this.classList.add('placeholder'); }">e.g. English B Paper 1 HL</th>`;
-            }
-            tableHTML += `
-                                </tr>
+                                    <th class="sticky-col">Exam Date: ${examDate}</th>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<th contenteditable='true' class='placeholder' onfocus="clearPlaceholder(this)" onblur="restorePlaceholder(this)">e.g. English B Paper 1 HL</th>`).join('') +
+                `</tr>
                             </thead>
                             <tbody>
-                                <tr><td class="sticky-col sticky-col-content">Exam Duration</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `
-                    <td>
-                        <input type='number' class='form-control form-control-sm' id='durationHours${i}' placeholder='Hours' min='0' max='4' value='0' onchange='calculateTimes(${i})' oninput='updateHrText(${i})'> <span id='hrText${i}'>hr</span>
-                        <input type='number' class='form-control form-control-sm' id='durationMinutes${i}' placeholder='Minutes' min='0' max='60' value='0' onchange='calculateTimes(${i})'> mins
-                    </td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Reading Time Allocated</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `
-                    <td>
-                        <input type='checkbox' id='noReading${i}' onchange='calculateTimes(${i})'> N/A
-                        <input type='number' class='form-control form-control-sm' id='readingTime${i}' placeholder='Minutes' min='0' max='20' value='5' onchange='calculateTimes(${i})'>
-                    </td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Start Time</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<td><input type='text' class='form-control timepicker' id='startTime${i}' placeholder="Select Time"></td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Reading Period</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<td><div id='readingTimeDisplay${i}'></div></td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">30 Mins Remaining</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<td><div id='thirtyMin${i}'></div></td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">5 Mins Remaining</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<td><div id='fiveMin${i}'></div></td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">End</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `<td><div id='endTime${i}'></div></td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Accommodations (%)</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                tableHTML += `
-                    <td>
-                        <input type='checkbox' id='noAccommodations${i}' onchange='toggleAccommodationInput(${i})' checked> N/A
-                        <input type='number' class='form-control form-control-sm' id='accommodations${i}' placeholder='%' min='0' max='100' value='0' onchange='calculateTimes(${i})'>
-                        <div id='accommodationEndTime${i}'></div>
-                    </td>`;
-            }
-            tableHTML += `</tr></tbody></table>
-            <div id="additionalButtons" class="mt-3">
-                <button class="btn btn-primary" onclick="exportToExcel()">Download to Excel</button>
-                <button class="btn btn-finalize ml-2" onclick="displayFinalizedTable()">Finalized Table Web View</button>
-            </div>
-            </div>
-            `;
-
-            tableArea.innerHTML = tableHTML;
-
-            // Initialize Flatpickr for newly created inputs
+                                <tr>
+                                    <td class="sticky-col sticky-col-content">Exam Duration</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `
+                                        <td>
+                                            <input type='number' class='form-control form-control-sm' id='durationHours${i + 1}' placeholder='Hours' min='0' max='4' value='0' onchange='calculateTimes(${i + 1})' oninput='updateHrText(${i + 1})'>
+                                            <span id='hrText${i + 1}'>hr</span>
+                                            <input type='number' class='form-control form-control-sm' id='durationMinutes${i + 1}' placeholder='Minutes' min='0' max='60' value='0' onchange='calculateTimes(${i + 1})'> mins
+                                        </td>`).join('') +
+                `</tr>
+                                <tr>
+                                    <td class="sticky-col sticky-col-content">Reading Time Allocated</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `
+                                        <td>
+                                            <input type='checkbox' id='noReading${i + 1}' onchange='calculateTimes(${i + 1})'> N/A
+                                            <input type='number' class='form-control form-control-sm' id='readingTime${i + 1}' placeholder='Minutes' min='0' max='20' value='5' onchange='calculateTimes(${i + 1})'>
+                                        </td>`).join('') +
+                `</tr>
+                                <tr>
+                                    <td class="sticky-col sticky-col-content">Start Time</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td><input type='text' class='form-control timepicker' id='startTime${i + 1}' placeholder="Select Time"></td>`).join('') +
+                `</tr>
+                                <tr>
+                                    <td class="sticky-col sticky-col-content">Reading Period</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td><div id='readingTimeDisplay${i + 1}'></div></td>`).join('') +
+                `</tr>
+                                <tr>
+                                    <td class="sticky-col sticky-col-content">30 Mins Remaining</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td><div id='thirtyMin${i + 1}'></div></td>`).join('') +
+                `</tr>
+                                <tr>
+                                    <td class="sticky-col sticky-col-content">5 Mins Remaining</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td><div id='fiveMin${i + 1}'></div></td>`).join('') +
+                `</tr>
+                                <tr>
+                                    <td class="sticky-col sticky-col-content">End</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td><div id='endTime${i + 1}'></div></td>`).join('') +
+                `</tr>
+                                <tr>
+                                    <td class="sticky-col sticky-col-content">Accommodations (%)</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `
+                                        <td>
+                                            <input type='checkbox' id='noAccommodations${i + 1}' onchange='toggleAccommodationInput(${i + 1})' checked> N/A
+                                            <input type='number' class='form-control form-control-sm' id='accommodations${i + 1}' placeholder='%' min='0' max='100' value='0' onchange='calculateTimes(${i + 1})'>
+                                            <div id='accommodationEndTime${i + 1}'></div>
+                                        </td>`).join('') +
+                `</tr>
+                            </tbody>
+                        </table>
+                        <div id="additionalButtons" class="mt-3">
+                            <button class="btn btn-primary" onclick="exportToExcel()">Export to Excel</button>
+                            <button class="btn btn-secondary-custom ml-2" onclick="saveSchedule()">Save Schedule</button>
+                            <button class="btn btn-secondary-custom ml-2" onclick="loadSchedule()">Load Schedule</button>
+                            <button class="btn btn-finalize ml-2" onclick="displayFinalizedTable()">Finalized Table Web View</button>
+                        </div>
+                    </div>
+                </div>`;
             flatpickr('.timepicker', {
                 enableTime: true,
                 noCalendar: true,
                 dateFormat: "H:i",
                 time_24hr: true,
-                onChange: function(selectedDates, dateStr, instance) {
-                    const index = instance.element.id.match(/\d+/)[0];
-                    calculateTimes(index);
+                onChange: function (selectedDates, dateStr, instance) {
+                    calculateTimes(instance.element.id.match(/\d+/)[0]);
                 }
             });
         }
 
+        function displayErrorMessage(message) {
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'error-message';
+            errorMessage.innerText = message;
+            const formGroup = document.querySelector('.form-group.col-md-6');
+            formGroup.appendChild(errorMessage);
+            setTimeout(() => {
+                errorMessage.remove();
+            }, 3000);
+        }
+
         function updateHrText(index) {
             const hours = document.getElementById(`durationHours${index}`).value;
-            const hrText = document.getElementById(`hrText${index}`);
-            hrText.textContent = hours == 1 ? "hr" : "hrs";
+            document.getElementById(`hrText${index}`).textContent = hours == 1 ? "hr" : "hrs";
         }
 
         function calculateTimes(index) {
@@ -303,22 +373,14 @@
                 const thirtyMin = endTime.clone().subtract(30, 'minutes').format('HH:mm');
                 const fiveMin = endTime.clone().subtract(5, 'minutes').format('HH:mm');
                 const readingDisplay = document.getElementById(`noReading${index}`).checked ? "N/A" : `${startTime.format('HH:mm')} - ${examStartTime.format('HH:mm')}`;
-
                 document.getElementById(`readingTimeDisplay${index}`).textContent = readingDisplay;
                 document.getElementById(`thirtyMin${index}`).textContent = thirtyMin;
                 document.getElementById(`fiveMin${index}`).textContent = fiveMin;
                 document.getElementById(`endTime${index}`).textContent = endTime.format('HH:mm');
-                
-                // Update accommodation end time if applicable
                 calculateAccommodations(index);
-
-                // Store the reading period start and end times
                 document.getElementById(`readingTimeDisplay${index}`).dataset.start = startTime.format('HH:mm');
                 document.getElementById(`readingTimeDisplay${index}`).dataset.end = examStartTime.format('HH:mm');
-
-                // Store the end time considering accommodation
-                const accommodationEndTime = document.getElementById(`accommodationEndTime${index}`).innerText;
-                document.getElementById(`endTime${index}`).dataset.accommodationEnd = accommodationEndTime || endTime.format('HH:mm');
+                document.getElementById(`endTime${index}`).dataset.accommodationEnd = document.getElementById(`accommodationEndTime${index}`).innerText || endTime.format('HH:mm');
             }
         }
 
@@ -327,15 +389,13 @@
             const accommodationsCheckbox = document.getElementById(`noAccommodations${index}`);
             const accommodations = parseInt(document.getElementById(`accommodations${index}`).value);
             const accommodationEndTime = document.getElementById(`accommodationEndTime${index}`);
-            
             if (accommodationsCheckbox.checked) {
                 accommodationEndTime.textContent = '';
             } else if (endTime && accommodations > 0) {
                 const endMoment = moment(endTime, 'HH:mm');
                 const durationMinutes = (parseInt(document.getElementById(`durationHours${index}`).value) * 60) + parseInt(document.getElementById(`durationMinutes${index}`).value);
                 const additionalTime = durationMinutes * (accommodations / 100);
-                const newEndTime = endMoment.clone().add(additionalTime, 'minutes').format('HH:mm');
-                accommodationEndTime.textContent = newEndTime;
+                accommodationEndTime.textContent = endMoment.clone().add(additionalTime, 'minutes').format('HH:mm');
             } else {
                 accommodationEndTime.textContent = 'N/A';
             }
@@ -344,173 +404,118 @@
         function displayFinalizedTable() {
             const numberOfExams = parseInt(document.getElementById("numExams").value);
             const examDate = document.getElementById("examDate").value;
-
             if (isNaN(numberOfExams) || !examDate) {
                 alert("Please enter a valid number of exams and select a date.");
                 return;
             }
-
-            // Hide scheduling view and show finalized view
             document.getElementById("scheduleView").style.display = "none";
             document.getElementById("finalizedView").style.display = "block";
-
-            // Show the clock
-            const clockArea = document.getElementById("clockArea");
-            clockArea.innerHTML = '<div id="clock"></div>';
+            document.getElementById("clockArea").innerHTML = '<div id="clock"></div>';
             updateClock();
             setInterval(updateClock, 1000);
-
             const finalizedTableArea = document.getElementById("finalizedTableArea");
-            finalizedTableArea.innerHTML = "";
-            let tableHTML = `
+            finalizedTableArea.innerHTML = `
                 <div class="mt-3">
                     <table class='table table-bordered table-hover table-striped'>
                         <thead>
                             <tr>
-                                <th class="sticky-col">Exam Date: ${examDate}</th>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                const subject = document.querySelector(`#tableArea th:nth-child(${i + 1})`).innerText.trim();
-                tableHTML += `<th>${subject}</th>`;
-            }
-            tableHTML += `
-                            </tr>
+                                <th class="sticky-col">Exam Date: ${examDate}</th>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<th>${document.querySelector(`#tableArea th:nth-child(${i + 2})`).innerText.trim()}</th>`).join('') +
+                `</tr>
                         </thead>
                         <tbody>
-                            <tr><td class="sticky-col sticky-col-content">Exam Duration</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                const durationHours = document.getElementById(`durationHours${i}`).value;
-                const durationMinutes = document.getElementById(`durationMinutes${i}`).value;
-                const duration = `${durationHours > 0 ? durationHours + (durationHours == 1 ? ' hr ' : ' hrs ') : ''}${durationMinutes > 0 ? durationMinutes + ' mins' : ''}`;
-                tableHTML += `<td>${duration}</td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Reading Time Allocated</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                const readingTime = document.getElementById(`noReading${i}`).checked ? "N/A" : document.getElementById(`readingTime${i}`).value + " mins";
-                tableHTML += `<td>${readingTime}</td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Start Time</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                const startTime = document.getElementById(`startTime${i}`).value;
-                tableHTML += `<td id='startTime${i}Cell'>${moment(startTime, 'HH:mm').format('HH:mm')}</td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Reading Period</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                const readingDisplay = document.getElementById(`noReading${i}`).checked ? "N/A" : document.getElementById(`readingTimeDisplay${i}`).innerText;
-                tableHTML += `<td id='readingPeriod${i}Cell'>${readingDisplay}</td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">30 Mins Remaining</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                const thirtyMin = document.getElementById(`thirtyMin${i}`).textContent;
-                tableHTML += `<td id='thirtyMin${i}Cell'>${thirtyMin}</td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">5 Mins Remaining</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                const fiveMin = document.getElementById(`fiveMin${i}`).textContent;
-                tableHTML += `<td id='fiveMin${i}Cell'>${fiveMin}</td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">End</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                const endTime = document.getElementById(`endTime${i}`).textContent;
-                tableHTML += `<td id='endTime${i}Cell'>${endTime}</td>`;
-            }
-            tableHTML += `</tr><tr><td class="sticky-col sticky-col-content">Accommodations (%)</td>`;
-            for (let i = 1; i <= numberOfExams; i++) {
-                const accommodations = document.getElementById(`noAccommodations${i}`).checked ? "N/A" : document.getElementById(`accommodationEndTime${i}`).innerText;
-                tableHTML += `<td id='accommodation${i}Cell'>${accommodations}</td>`;
-            }
-            tableHTML += `</tr></tbody></table>
+                            <tr>
+                                <td class="sticky-col sticky-col-content">Exam Duration</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => {
+                    const durationHours = document.getElementById(`durationHours${i + 1}`).value;
+                    const durationMinutes = document.getElementById(`durationMinutes${i + 1}`).value;
+                    const duration = `${durationHours > 0 ? durationHours + (durationHours == 1 ? ' hr ' : ' hrs ') : ''}${durationMinutes > 0 ? durationMinutes + ' mins' : ''}`;
+                    return `<td>${duration}</td>`;
+                }).join('') +
+                `</tr>
+                            <tr>
+                                <td class="sticky-col sticky-col-content">Reading Time Allocated</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td>${document.getElementById(`noReading${i + 1}`).checked ? "N/A" : document.getElementById(`readingTime${i + 1}`).value + " mins"}</td>`).join('') +
+                `</tr>
+                            <tr>
+                                <td class="sticky-col sticky-col-content">Start Time</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td id='startTime${i + 1}Cell'>${moment(document.getElementById(`startTime${i + 1}`).value, 'HH:mm').format('HH:mm')}</td>`).join('') +
+                `</tr>
+                            <tr>
+                                <td class="sticky-col sticky-col-content">Reading Period</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td id='readingPeriod${i + 1}Cell'>${document.getElementById(`noReading${i + 1}`).checked ? "N/A" : document.getElementById(`readingTimeDisplay${i + 1}`).innerText}</td>`).join('') +
+                `</tr>
+                            <tr>
+                                <td class="sticky-col sticky-col-content">30 Mins Remaining</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td id='thirtyMin${i + 1}Cell'>${document.getElementById(`thirtyMin${i + 1}`).textContent}</td>`).join('') +
+                `</tr>
+                            <tr>
+                                <td class="sticky-col sticky-col-content">5 Mins Remaining</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td id='fiveMin${i + 1}Cell'>${document.getElementById(`fiveMin${i + 1}`).textContent}</td>`).join('') +
+                `</tr>
+                            <tr>
+                                <td class="sticky-col sticky-col-content">End</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td id='endTime${i + 1}Cell'>${document.getElementById(`endTime${i + 1}`).textContent}</td>`).join('') +
+                `</tr>
+                            <tr>
+                                <td class="sticky-col sticky-col-content">Accommodations (%)</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td id='accommodation${i + 1}Cell'>${document.getElementById(`noAccommodations${i + 1}`).checked ? "N/A" : document.getElementById(`accommodationEndTime${i + 1}`).innerText}</td>`).join('') +
+                `</tr>
+                        </tbody>
+                    </table>
                 </div>`;
-
-            finalizedTableArea.innerHTML = tableHTML;
-
-            setInterval(updateHighlightedCells, 1000); // Update cell highlighting every second
+            setInterval(updateHighlightedCells, 1000);
         }
 
         function updateClock() {
-            const now = moment();
-            const timeString = now.format('HH:mm:ss');
-            document.getElementById('clock').textContent = timeString;
+            document.getElementById('clock').textContent = moment().format('HH:mm:ss');
         }
 
         function updateHighlightedCells() {
             const now = moment().format('HH:mm');
+            Array.from({ length: document.getElementById("numExams").value }, (_, i) => {
+                const index = i + 1;
+                const startTime = document.getElementById(`startTime${index}`).value;
+                const readingPeriodStart = document.getElementById(`readingTimeDisplay${index}`).dataset.start;
+                const readingPeriodEnd = document.getElementById(`readingTimeDisplay${index}`).dataset.end;
+                const thirtyMin = document.getElementById(`thirtyMin${index}`).textContent;
+                const fiveMin = document.getElementById(`fiveMin${index}`).textContent;
+                const endTime = document.getElementById(`endTime${index}`).textContent;
+                const accommodationEnd = document.getElementById(`endTime${index}`).dataset.accommodationEnd;
+                const startTimeCell = document.getElementById(`startTime${index}Cell`);
+                const readingPeriodCell = document.getElementById(`readingPeriod${index}Cell`);
+                const thirtyMinCell = document.getElementById(`thirtyMin${index}Cell`);
+                const fiveMinCell = document.getElementById(`fiveMin${index}Cell`);
+                const endTimeCell = document.getElementById(`endTime${index}Cell`);
+                const accommodationCell = document.getElementById(`accommodation${index}Cell`);
 
-            for (let i = 1; i <= document.getElementById("numExams").value; i++) {
-                const startTime = document.getElementById(`startTime${i}`).value;
-                const readingPeriodStart = document.getElementById(`readingTimeDisplay${i}`).dataset.start;
-                const readingPeriodEnd = document.getElementById(`readingTimeDisplay${i}`).dataset.end;
-                const thirtyMin = document.getElementById(`thirtyMin${i}`).textContent;
-                const fiveMin = document.getElementById(`fiveMin${i}`).textContent;
-                const endTime = document.getElementById(`endTime${i}`).textContent;
-                const accommodationEnd = document.getElementById(`endTime${i}`).dataset.accommodationEnd;
+                startTimeCell.classList.toggle('start-time-cell', startTime === now);
+                readingPeriodCell.classList.toggle('reading-period-cell', readingPeriodStart && readingPeriodEnd && now >= readingPeriodStart && now < readingPeriodEnd);
+                thirtyMinCell.classList.toggle('thirty-min-cell', now >= thirtyMin && now < fiveMin);
+                fiveMinCell.classList.toggle('five-min-cell', now >= fiveMin && now < endTime);
+                endTimeCell.classList.toggle('end-time-cell', endTime === now);
 
-                const startTimeCell = document.getElementById(`startTime${i}Cell`);
-                const readingPeriodCell = document.getElementById(`readingPeriod${i}Cell`);
-                const thirtyMinCell = document.getElementById(`thirtyMin${i}Cell`);
-                const fiveMinCell = document.getElementById(`fiveMin${i}Cell`);
-                const endTimeCell = document.getElementById(`endTime${i}Cell`);
-                const accommodationCell = document.getElementById(`accommodation${i}Cell`);
-
-                // Highlight start time cell
-                if (startTime === now) {
-                    startTimeCell.classList.add('start-time-cell');
-                } else {
-                    startTimeCell.classList.remove('start-time-cell');
-                }
-
-                // Highlight reading period cell
-                if (readingPeriodStart && readingPeriodEnd && now >= readingPeriodStart && now < readingPeriodEnd) {
-                    readingPeriodCell.classList.add('reading-period-cell');
-                } else {
-                    readingPeriodCell.classList.remove('reading-period-cell');
-                }
-
-                // Highlight 30 mins remaining cell
-                if (now >= thirtyMin && now < fiveMin) {
-                    thirtyMinCell.classList.add('thirty-min-cell');
-                } else {
-                    thirtyMinCell.classList.remove('thirty-min-cell');
-                }
-
-                // Highlight 5 mins remaining cell
-                if (now >= fiveMin && now < endTime) {
-                    fiveMinCell.classList.add('five-min-cell');
-                } else {
-                    fiveMinCell.classList.remove('five-min-cell');
-                }
-
-                // Highlight end time cell
-                if (endTime === now) {
-                    endTimeCell.classList.add('end-time-cell');
-                } else {
-                    endTimeCell.classList.remove('end-time-cell');
-                }
-
-                // Handle accommodation period
                 if (accommodationEnd && now >= endTime && now < accommodationEnd) {
-                    greyOutColumnExceptAccommodation(i);
+                    greyOutColumnExceptAccommodation(index);
                     accommodationCell.classList.add('accommodation-cell');
                 } else if (accommodationEnd && now >= accommodationEnd) {
-                    greyOutColumn(i);
+                    greyOutColumn(index);
                 } else if (endTime === now) {
-                    greyOutColumn(i);
+                    greyOutColumn(index);
                 }
-            }
+            });
         }
 
         function greyOutColumn(index) {
-            const finalizedTableCells = document.querySelectorAll(`#finalizedTableArea td:nth-child(${index + 1})`);
-            finalizedTableCells.forEach(cell => {
+            document.querySelectorAll(`#finalizedTableArea td:nth-child(${index + 1})`).forEach(cell => {
                 cell.classList.add('greyed-out');
                 cell.classList.remove('accommodation-cell');
             });
         }
 
         function greyOutColumnExceptAccommodation(index) {
-            const finalizedTableCells = document.querySelectorAll(`#finalizedTableArea td:nth-child(${index + 1})`);
-            const accommodationCell = document.getElementById(`accommodation${index}Cell`);
-            finalizedTableCells.forEach(cell => {
-                if (cell !== accommodationCell) {
+            document.querySelectorAll(`#finalizedTableArea td:nth-child(${index + 1})`).forEach(cell => {
+                if (cell !== document.getElementById(`accommodation${index}Cell`)) {
                     cell.classList.add('greyed-out');
                 } else {
                     cell.classList.remove('greyed-out');
@@ -520,81 +525,140 @@
 
         function exportToExcel() {
             const examDate = document.getElementById("examDate").value || 'Set Exam Date';
-            const table = document.querySelector("table");
             const headers = ["Exam Duration", "Reading Time Allocated", "Start Time", "Reading Period", "30 Mins Remaining", "5 Mins Remaining", "End", "Accommodations (%)"];
-            const data = [[examDate, ...Array.from(table.rows[0].cells).slice(1).map(cell => cell.innerText.trim())]];
+            const data = [
+                [examDate, ...Array.from(document.querySelector("table").rows[0].cells).slice(1).map(cell => cell.innerText.trim())]
+            ];
 
             const numberOfExams = parseInt(document.getElementById("numExams").value);
-
-            for (let i = 0; i < headers.length; i++) {
-                const row = [headers[i]];
+            headers.forEach((header, i) => {
+                const row = [header];
                 for (let j = 1; j <= numberOfExams; j++) {
-                    let value = "";
-                    switch (i) {
-                        case 0:
-                            const hours = document.getElementById(`durationHours${j}`).value;
-                            const minutes = document.getElementById(`durationMinutes${j}`).value;
-                            value = `${hours > 0 ? hours + (hours == 1 ? ' hr ' : ' hrs ') : ''}${minutes > 0 ? minutes + ' mins' : ''}`;
-                            break;
-                        case 1:
-                            value = document.getElementById(`noReading${j}`).checked ? "N/A" : document.getElementById(`readingTime${j}`).value + " mins";
-                            break;
-                        case 2:
-                            value = moment(document.getElementById(`startTime${j}`).value, 'HH:mm').format('HH:mm');
-                            break;
-                        case 3:
-                            const startDisplay = moment(document.getElementById(`startTime${j}`).value, 'HH:mm').format('HH:mm');
-                            const endDisplay = moment(document.getElementById(`startTime${j}`).value, 'HH:mm').add(parseInt(document.getElementById(`readingTime${j}`).value), 'minutes').format('HH:mm');
-                            value = document.getElementById(`noReading${j}`).checked ? "N/A" : `${startDisplay} - ${endDisplay}`;
-                            break;
-                        case 4:
-                            value = moment(document.getElementById(`thirtyMin${j}`).textContent, 'HH:mm').format('HH:mm');
-                            break;
-                        case 5:
-                            value = moment(document.getElementById(`fiveMin${j}`).textContent, 'HH:mm').format('HH:mm');
-                            break;
-                        case 6:
-                            value = moment(document.getElementById(`endTime${j}`).textContent, 'HH:mm').format('HH:mm');
-                            break;
-                        case 7:
-                            value = document.getElementById(`noAccommodations${j}`).checked ? "N/A" : moment(document.getElementById(`accommodationEndTime${j}`).innerText, 'HH:mm').format('HH:mm');
-                            break;
-                    }
+                    const value = (() => {
+                        switch (i) {
+                            case 0:
+                                const hours = document.getElementById(`durationHours${j}`).value;
+                                const minutes = document.getElementById(`durationMinutes${j}`).value;
+                                return `${hours > 0 ? hours + (hours == 1 ? ' hr ' : ' hrs ') : ''}${minutes > 0 ? minutes + ' mins' : ''}`;
+                            case 1:
+                                return document.getElementById(`noReading${j}`).checked ? "N/A" : document.getElementById(`readingTime${j}`).value + " mins";
+                            case 2:
+                                return moment(document.getElementById(`startTime${j}`).value, 'HH:mm').format('HH:mm');
+                            case 3:
+                                const startDisplay = moment(document.getElementById(`startTime${j}`).value, 'HH:mm').format('HH:mm');
+                                const endDisplay = moment(document.getElementById(`startTime${j}`).value, 'HH:mm').add(parseInt(document.getElementById(`readingTime${j}`).value), 'minutes').format('HH:mm');
+                                return document.getElementById(`noReading${j}`).checked ? "N/A" : `${startDisplay} - ${endDisplay}`;
+                            case 4:
+                                return moment(document.getElementById(`thirtyMin${j}`).textContent, 'HH:mm').format('HH:mm');
+                            case 5:
+                                return moment(document.getElementById(`fiveMin${j}`).textContent, 'HH:mm').format('HH:mm');
+                            case 6:
+                                return moment(document.getElementById(`endTime${j}`).textContent, 'HH:mm').format('HH:mm');
+                            case 7:
+                                return document.getElementById(`noAccommodations${j}`).checked ? "N/A" : moment(document.getElementById(`accommodationEndTime${j}`).innerText, 'HH:mm').format('HH:mm');
+                        }
+                    })();
                     row.push(value);
                 }
                 data.push(row);
-            }
+            });
 
             const worksheet = XLSX.utils.aoa_to_sheet(data);
+            worksheet['!cols'] = Array(data[0].length).fill({ wpx: 200 });
 
-            // Set column widths
-            const columnWidths = Array(data[0].length).fill({ wpx: 200 });
-            worksheet['!cols'] = columnWidths;
-
-            // Style alternating columns
-            const alternatingColors = ['FFFFFF', 'D3D3D3']; // Define alternating colors
-            for (let c = 0; c < data[0].length; c++) {
-                for (let r = 0; r < data.length; r++) {
-                    const cellAddress = XLSX.utils.encode_cell({ r: r, c: c });
-                    if (!worksheet[cellAddress].s) worksheet[cellAddress].s = {}; // Initialize style object if not present
-                    worksheet[cellAddress].s.fill = {
-                        patternType: 'solid',
-                        fgColor: { rgb: alternatingColors[c % 2] }
-                    };
-                }
-            }
+            data[0].forEach((_, c) => {
+                data.forEach((_, r) => {
+                    const cellAddress = XLSX.utils.encode_cell({ r, c });
+                    if (!worksheet[cellAddress].s) worksheet[cellAddress].s = {};
+                    worksheet[cellAddress].s.fill = { patternType: 'solid', fgColor: { rgb: ['FFFFFF', 'D3D3D3'][c % 2] } };
+                });
+            });
 
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Exam Schedule");
+            XLSX.writeFile(workbook, `exam-schedule-${examDate.replace(/-/g, '')}.xlsx`);
+        }
 
-            const filename = `exam-schedule-${examDate.replace(/-/g, '')}.xlsx`;
-            XLSX.writeFile(workbook, filename);
+        function saveSchedule() {
+            const scheduleData = {
+                examDate: document.getElementById("examDate").value,
+                numExams: document.getElementById("numExams").value,
+                exams: []
+            };
+
+            const numberOfExams = parseInt(document.getElementById("numExams").value);
+            const tableHeaders = document.querySelectorAll("#tableArea th");
+            scheduleData.headers = Array.from(tableHeaders).slice(1).map(header => header.textContent.trim());
+
+            for (let i = 1; i <= numberOfExams; i++) {
+                scheduleData.exams.push({
+                    subjectName: tableHeaders[i].textContent.trim(),
+                    durationHours: document.getElementById(`durationHours${i}`).value,
+                    durationMinutes: document.getElementById(`durationMinutes${i}`).value,
+                    readingTime: document.getElementById(`readingTime${i}`).value,
+                    startTime: document.getElementById(`startTime${i}`).value,
+                    noReading: document.getElementById(`noReading${i}`).checked,
+                    noAccommodations: document.getElementById(`noAccommodations${i}`).checked,
+                    accommodations: document.getElementById(`accommodations${i}`).value
+                });
+            }
+
+            const blob = new Blob([JSON.stringify(scheduleData, null, 2)], { type: 'application/json' });
+            saveAs(blob, `exam-schedule-${scheduleData.examDate}.json`);
+            displayErrorMessage("Schedule saved successfully.");
+        }
+
+        function loadSchedule() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = (event) => {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const savedData = JSON.parse(e.target.result);
+
+                    document.getElementById("examDate").value = savedData.examDate;
+                    document.getElementById("numExams").value = savedData.numExams;
+                    generateSchedule();
+
+                    const tableHeaders = document.querySelectorAll("#tableArea th");
+                    savedData.headers.forEach((header, i) => {
+                        tableHeaders[i + 1].textContent = header;
+                    });
+
+                    const numberOfExams = parseInt(savedData.numExams);
+                    for (let i = 1; i <= numberOfExams; i++) {
+                        document.getElementById(`durationHours${i}`).value = savedData.exams[i - 1].durationHours;
+                        document.getElementById(`durationMinutes${i}`).value = savedData.exams[i - 1].durationMinutes;
+                        document.getElementById(`readingTime${i}`).value = savedData.exams[i - 1].readingTime;
+                        document.getElementById(`startTime${i}`).value = savedData.exams[i - 1].startTime;
+                        document.getElementById(`noReading${i}`).checked = savedData.exams[i - 1].noReading;
+                        document.getElementById(`noAccommodations${i}`).checked = savedData.exams[i - 1].noAccommodations;
+                        document.getElementById(`accommodations${i}`).value = savedData.exams[i - 1].accommodations;
+                    }
+
+                    flatpickr('.timepicker', {
+                        enableTime: true,
+                        noCalendar: true,
+                        dateFormat: "H:i",
+                        time_24hr: true,
+                        onChange: function (selectedDates, dateStr, instance) {
+                            calculateTimes(instance.element.id.match(/\d+/)[0]);
+                        }
+                    });
+
+                    displayErrorMessage("Schedule loaded successfully.");
+                };
+                reader.readAsText(file);
+            };
+            input.click();
         }
 
         function showScheduleView() {
             document.getElementById("scheduleView").style.display = "block";
             document.getElementById("finalizedView").style.display = "none";
-            removeGreyedOut();
+            document.querySelectorAll('.greyed-out').forEach(cell => cell.classList.remove('greyed-out'));
         }
 
         function toggleAccommodationInput(index) {
@@ -610,14 +674,22 @@
             calculateAccommodations(index);
         }
 
-        function removeGreyedOut() {
-            const greyedOutCells = document.querySelectorAll('.greyed-out');
-            greyedOutCells.forEach(cell => {
-                cell.classList.remove('greyed-out');
-            });
+        function clearPlaceholder(element) {
+            if (element.innerText === 'e.g. English B Paper 1 HL') {
+                element.innerText = '';
+                element.classList.remove('placeholder');
+            }
+        }
+
+        function restorePlaceholder(element) {
+            if (element.innerText === '') {
+                element.innerText = 'e.g. English B Paper 1 HL';
+                element.classList.add('placeholder');
+            }
         }
     </script>
 </head>
+
 <body onload="showScheduleView()">
     <div id="scheduleView" class="container-fluid">
         <a href="https://github.com/interstellar-hitchhiker/MASALA" class="readme-link" target="_blank">Read.Me</a>
@@ -627,19 +699,19 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="examDate" class="form-label">What is the date you are scheduling the exams for?</label>
-                        <input type="date" id="examDate" class="form-control mb-3">
+                        <input type="date" id="examDate" class="form-control mb-3" aria-label="Exam Date">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="numExams" class="form-label">How many exams are being scheduled for the given day?</label>
-                        <input type="number" id="numExams" class="form-control mb-3" placeholder="Enter number of exams" min="1" max="20" value="1">
+                        <input type="number" id="numExams" class="form-control mb-3" placeholder="Enter number of exams" min="1" max="20" value="1" aria-label="Number of Exams">
                     </div>
                 </div>
+                <div class="error-message-container"></div>
                 <button class="btn btn-success" onclick="generateSchedule()">Create Schedule Table</button>
                 <div id="tableArea" class="mt-3"></div>
             </div>
         </div>
     </div>
-
     <div id="finalizedView" class="container-fluid">
         <div class="card">
             <div class="card-body">
@@ -650,4 +722,5 @@
         </div>
     </div>
 </body>
+
 </html>
