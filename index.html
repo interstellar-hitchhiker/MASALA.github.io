@@ -208,6 +208,20 @@
             margin: 10px 0;
         }
 
+        .popup-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
         @media (max-width: 768px) {
             .card-title {
                 font-size: 2rem;
@@ -263,7 +277,7 @@
             }
 
             if (errorMessage) {
-                displayErrorMessage(errorMessage);
+                displayPopupMessage(errorMessage);
                 return;
             }
 
@@ -345,14 +359,19 @@
             });
         }
 
-        function displayErrorMessage(message) {
-            const errorMessage = document.createElement('div');
-            errorMessage.className = 'error-message';
-            errorMessage.innerText = message;
-            const formGroup = document.querySelector('.form-group.col-md-6');
-            formGroup.appendChild(errorMessage);
+        function displayPopupMessage(message) {
+            const popupMessage = document.createElement('div');
+            popupMessage.className = 'popup-message';
+            popupMessage.innerText = message;
+            document.body.appendChild(popupMessage);
             setTimeout(() => {
-                errorMessage.remove();
+                popupMessage.style.opacity = 1;
+            }, 100);
+            setTimeout(() => {
+                popupMessage.style.opacity = 0;
+                setTimeout(() => {
+                    popupMessage.remove();
+                }, 500);
             }, 3000);
         }
 
@@ -605,7 +624,7 @@
 
             const blob = new Blob([JSON.stringify(scheduleData, null, 2)], { type: 'application/json' });
             saveAs(blob, `exam-schedule-${scheduleData.examDate}.json`);
-            displayErrorMessage("Schedule saved successfully.");
+            displayPopupMessage("Schedule saved successfully.");
         }
 
         function loadSchedule() {
@@ -648,7 +667,11 @@
                         }
                     });
 
-                    displayErrorMessage("Schedule loaded successfully.");
+                    savedData.exams.forEach((exam, i) => {
+                        calculateTimes(i + 1);
+                    });
+
+                    displayPopupMessage("Schedule loaded successfully.");
                 };
                 reader.readAsText(file);
             };
@@ -706,8 +729,8 @@
                         <input type="number" id="numExams" class="form-control mb-3" placeholder="Enter number of exams" min="1" max="20" value="1" aria-label="Number of Exams">
                     </div>
                 </div>
-                <div class="error-message-container"></div>
                 <button class="btn btn-success" onclick="generateSchedule()">Create Schedule Table</button>
+                <button class="btn btn-secondary-custom ml-2" onclick="loadSchedule()">Load Schedule</button>
                 <div id="tableArea" class="mt-3"></div>
             </div>
         </div>
