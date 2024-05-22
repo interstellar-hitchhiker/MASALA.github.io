@@ -26,6 +26,8 @@ Welcome to the Exam Scheduler and Display. This tool is designed to help you eff
 5. **View and Export Schedule**:
    - Click on "Download to Excel" to export the schedule to an Excel file.
    - Click on "Finalized Table Web View" to see a finalized view of the schedule with live updates.
+   - Click on "Save Schedule" to keep an offline .json version of the completed table with subject names and time details to load and display at a later date.
+   - Click on "Load Schedule" to upload a saved .json file and display the exam(s) with subject names and time details already to go.
 
 ## GitHub Pages Site
 
