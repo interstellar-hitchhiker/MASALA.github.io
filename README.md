@@ -1,6 +1,7 @@
 # MASALA.github.io
 Exam Schedule Creator and Display 
 https://interstellar-hitchhiker.github.io/MASALA/
+
 # Exam Scheduler and Display
 
 Welcome to the Exam Scheduler and Display. This tool is designed to help you efficiently schedule and manage your IBDP exams. The scheduler enables you to create a detailed exam schedule, including exam durations, reading times, start times, and accommodations. The schedule can be displayed in a finalized web view or exported to an Excel file for easy sharing, printing, and record-keeping.
@@ -12,6 +13,8 @@ Welcome to the Exam Scheduler and Display. This tool is designed to help you eff
 - **Accommodation Adjustments**: Includes functionality to add extra time for students with special needs.
 - **Export to Excel**: Download the finalized exam schedule as an Excel file.
 - **Live Time Updates**: Displays a live clock and highlights schedule cells based on the current time.
+- **Save and Load Schedule**: Save the current schedule to a JSON file and load a saved schedule from a JSON file.
+- **Responsive Design**: Ensures usability across different devices and screen sizes.
 
 ## How to Use
 
@@ -24,14 +27,14 @@ Welcome to the Exam Scheduler and Display. This tool is designed to help you eff
    - Allocate reading time if applicable.
    - Set the start time for each exam.
 5. **View and Export Schedule**:
-   - Click on "Download to Excel" to export the schedule to an Excel file.
+   - Click on "Export to Excel" to export the schedule to an Excel file.
    - Click on "Finalized Table Web View" to see a finalized view of the schedule with live updates.
    - Click on "Save Schedule" to keep an offline .json version of the completed table with subject names and time details to load and display at a later date.
    - Click on "Load Schedule" to upload a saved .json file and display the exam(s) with subject names and time details already to go.
 
 ## GitHub Pages Site
 
-You can view and interact with the MASALA: IBDP Exam Scheduler directly here: https://interstellar-hitchhiker.github.io/MASALA/
+You can view and interact with the MASALA: IBDP Exam Scheduler directly here: [https://interstellar-hitchhiker.github.io/MASALA/](https://interstellar-hitchhiker.github.io/MASALA/)
 
 ## Installation
 
@@ -56,7 +59,10 @@ To set up the MASALA: IBDP Exam Scheduler locally:
 - **JavaScript**: Functionality and interactivity.
 - **Bootstrap**: Responsive design framework.
 - **Moment.js**: Time manipulation and formatting.
+- **Flatpickr**: Date and time picker.
 - **SheetJS (xlsx)**: Exporting the schedule to Excel.
+- **FileSaver.js**: Saving schedules as JSON files.
+- **jsPDF**: Generating PDF files.
 
 ## Contributing
 
