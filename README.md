@@ -26,6 +26,7 @@ Welcome to the Exam Scheduler and Display. This tool is designed to help you eff
    - Specify the duration (hours and minutes) for each exam.
    - Allocate reading time if applicable.
    - Set the start time for each exam.
+   - When using accommodations, the accommodation percentage is not displayed; only the finalized end time is shown. The 30- and 5-minute warnings apply to the original exam times, with the accommodation time added at the end. This setup assumes that special needs and non-special needs students are sharing the same room, with the 30- and 5-minute warnings communicated orally to the individual with accommodations. If special needs students use a separate room, create a single column for each student and each exam, entering the specific percentage needed for each student (e.g., English B P1 (Smith) and Chemistry P3 SL (Kim)). This allows individuals to see the original exam durations and times, as well as their updated end time based on their accommodation. Future iterations could update this section to reorder the static column rows so accommodations are above the start time, and automatically update the 30-minute, 5-minute, and end times based on the accommodation percentage.
 5. **View and Export Schedule**:
    - Click on "Export to Excel" to export the schedule to an Excel file.
    - Click on "Finalized Table Web View" to see a finalized view of the schedule with live updates.
