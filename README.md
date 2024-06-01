@@ -1,4 +1,4 @@
-# MASALA.github.io
+# MASALA2.github.io
 Exam Schedule Creator and Display 
 https://interstellar-hitchhiker.github.io/MASALA/
 
