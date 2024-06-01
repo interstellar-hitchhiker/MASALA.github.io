@@ -584,18 +584,23 @@
             });
 
             const worksheet = XLSX.utils.aoa_to_sheet(data);
-            worksheet['!cols'] = Array(data[0].length).fill({ wpx: 200 });
 
-            data[0].forEach((_, c) => {
-                data.forEach((_, r) => {
-                    const cellAddress = XLSX.utils.encode_cell({ r, c });
-                    if (!worksheet[cellAddress].s) worksheet[cellAddress.s] = {};
-                    worksheet[cellAddress.s.fill] = { patternType: 'solid', fgColor: { rgb: ['FFFFFF', 'D3D3D3'][c % 2] } };
-                });
-            });
+            // Set the column widths
+            worksheet['!cols'] = [{ wpx: 150 }, ...Array(data[0].length - 1).fill({ wpx: 150 })];
 
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Exam Schedule");
+
+            // Styling the worksheet
+            const cellStyle = {
+                font: { name: 'Arial', sz: 12 },
+                alignment: { vertical: 'center', horizontal: 'center' },
+                border: { top: { style: 'thin' }, bottom: { style: 'thin' }, left: { style: 'thin' }, right: { style: 'thin' } }
+            };
+            Object.keys(worksheet).forEach(cell => {
+                if (cell[0] !== '!') worksheet[cell].s = cellStyle;
+            });
+
             XLSX.writeFile(workbook, `exam-schedule-${examDate.replace(/-/g, '')}.xlsx`);
         }
 
