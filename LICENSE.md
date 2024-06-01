@@ -114,3 +114,31 @@ d. Nothing in this Public License constitutes or may be interpreted as a limitat
 Creative Commons is not a party to its public licenses. Notwithstanding, Creative Commons may elect to apply one of its public licenses to material it publishes and in those instances will be considered the “Licensor.” The text of the Creative Commons public licenses is dedicated to the public domain under the CC0 Public Domain Dedication. Except for the limited purpose of indicating that material is shared under a Creative Commons public license or as otherwise permitted by the Creative Commons policies published at creativecommons.org/policies, Creative Commons does not authorize the use of the trademark “Creative Commons” or any other trademark or logo of Creative Commons without its prior written consent including, without limitation, in connection with any unauthorized modifications to any of its public licenses or any other arrangements, understandings, or agreements concerning use of licensed material. For the avoidance of doubt, this paragraph does not form part of the public licenses.
 
 Creative Commons may be contacted at creativecommons.org.
+
+Summary of the Creative Commons Attribution-NonCommercial 4.0 International Public License (CC BY-NC 4.0) for Users
+This license lets you share and adapt the material under certain conditions. Here's what you need to know:
+
+Key Points:
+Attribution: You must give proper credit, provide a link to the license, and indicate if changes were made. Do this in any reasonable manner but not in a way that suggests the creator endorses you or your use.
+
+Non-Commercial: You can use the material for non-commercial purposes only. You cannot use it to make money.
+
+Share Alike: If you modify or adapt the material, you must distribute your contributions under the same license as the original.
+
+Disclaimer of Warranties and Limitation of Liability: The material is provided "as-is" without warranties of any kind. The creator is not liable for any use of the material. You accept that you use the material at your own risk.
+
+No Endorsement: You cannot imply that the creator endorses you or your use of the material.
+
+Liability:
+Creator's Liability: The creator is not responsible for how you use the code. The license includes a disclaimer of warranties and limits liability, meaning you accept the material "as-is" and the creator is not responsible for any issues or damages that arise.
+User's Responsibility: You are responsible for your use of the code. You must follow the license terms and cannot use it for commercial purposes.
+
+Commercial Use:
+Not Allowed: You cannot use the material to make money. The license specifically states that it is for non-commercial use only.
+
+Practical Implications:
+If you use the code and it causes issues, the creator is not liable.
+You cannot make money from the code.
+You must credit the creator and indicate if you made changes.
+If you modify the code, you must share it under the same license.
+In summary, this license lets you share and adapt the code non-commercially, with proper attribution, and requires you to share any adapted material under the same license. The creator is protected from liability for any issues that arise from your use of the code.
