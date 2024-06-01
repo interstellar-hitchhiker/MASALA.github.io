@@ -1,4 +1,4 @@
-# MASALA2.github.io
+# MASALA2.github.io 
 Exam Schedule Creator and Display V2 (No Color-Changing Display Cells, but Includes Auto Accommodation Time Calculations)
 https://interstellar-hitchhiker.github.io/MASALA2/
 
