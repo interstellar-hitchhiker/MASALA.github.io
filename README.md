@@ -66,7 +66,7 @@ To set up the MASALA: IBDP Exam Scheduler locally:
 
 ## License
 
-This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) License. This includes all past, current, and future versions. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) License. This includes all past, current, and future versions. See the [LICENSE](https://github.com/interstellar-hitchhiker/MASALA/blob/main/LICENSE) file for more details.
 
 ## Contributing
 
