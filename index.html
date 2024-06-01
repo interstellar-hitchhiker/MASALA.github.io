@@ -85,9 +85,9 @@
         }
 
         #clock {
-            font-size: 72px;
+            font-size: 96px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: #333;
         }
 
@@ -222,6 +222,11 @@
             transition: opacity 0.5s;
         }
 
+        .btn-small {
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+
         @media (max-width: 768px) {
             .card-title {
                 font-size: 2rem;
@@ -235,6 +240,11 @@
             .btn {
                 padding: 8px 16px;
                 margin: 3px 0;
+            }
+
+            .btn-small {
+                font-size: 10px;
+                padding: 3px 8px;
             }
         }
     </style>
@@ -302,6 +312,14 @@
                                         </td>`).join('') +
                 `</tr>
                                 <tr>
+                                    <td class="sticky-col sticky-col-content">Accommodations (%)</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `
+                                        <td>
+                                            <input type='checkbox' id='noAccommodations${i + 1}' onchange='toggleAccommodationInput(${i + 1})' checked> N/A
+                                            <input type='number' class='form-control form-control-sm' id='accommodations${i + 1}' placeholder='%' min='0' max='100' value='0' onchange='calculateTimes(${i + 1})'>
+                                        </td>`).join('') +
+                `</tr>
+                                <tr>
                                     <td class="sticky-col sticky-col-content">Reading Time Allocated</td>` +
                 Array.from({ length: numberOfExams }, (_, i) => `
                                         <td>
@@ -329,22 +347,13 @@
                                     <td class="sticky-col sticky-col-content">End</td>` +
                 Array.from({ length: numberOfExams }, (_, i) => `<td><div id='endTime${i + 1}'></div></td>`).join('') +
                 `</tr>
-                                <tr>
-                                    <td class="sticky-col sticky-col-content">Accommodations (%)</td>` +
-                Array.from({ length: numberOfExams }, (_, i) => `
-                                        <td>
-                                            <input type='checkbox' id='noAccommodations${i + 1}' onchange='toggleAccommodationInput(${i + 1})' checked> N/A
-                                            <input type='number' class='form-control form-control-sm' id='accommodations${i + 1}' placeholder='%' min='0' max='100' value='0' onchange='calculateTimes(${i + 1})'>
-                                            <div id='accommodationEndTime${i + 1}'></div>
-                                        </td>`).join('') +
-                `</tr>
                             </tbody>
                         </table>
                         <div id="additionalButtons" class="mt-3">
                             <button class="btn btn-primary" onclick="exportToExcel()">Export to Excel</button>
                             <button class="btn btn-secondary-custom ml-2" onclick="saveSchedule()">Save Schedule</button>
                             <button class="btn btn-secondary-custom ml-2" onclick="loadSchedule()">Load Schedule</button>
-                            <button class="btn btn-finalize ml-2" onclick="displayFinalizedTable()">Finalized Table Web View</button>
+                            <button class="btn btn-finalize ml-2" onclick="displayFinalizedTable()">Finalized Schedule Display</button>
                         </div>
                     </div>
                 </div>`;
@@ -386,37 +395,29 @@
             const durationMinutes = hours * 60 + minutes;
             const readingTime = document.getElementById(`noReading${index}`).checked ? 0 : parseInt(document.getElementById(`readingTime${index}`).value);
             const startTime = moment(document.getElementById(`startTime${index}`).value, 'HH:mm');
+            const accommodationsCheckbox = document.getElementById(`noAccommodations${index}`);
+            const accommodations = parseInt(document.getElementById(`accommodations${index}`).value);
+
             if (!isNaN(durationMinutes) && startTime.isValid()) {
                 const examStartTime = startTime.clone().add(readingTime, 'minutes');
-                const endTime = examStartTime.clone().add(durationMinutes, 'minutes');
+                let endTime = examStartTime.clone().add(durationMinutes, 'minutes');
+
+                if (!accommodationsCheckbox.checked && accommodations > 0) {
+                    const additionalTime = durationMinutes * (accommodations / 100);
+                    endTime = endTime.clone().add(additionalTime, 'minutes');
+                }
+
                 const thirtyMin = endTime.clone().subtract(30, 'minutes').format('HH:mm');
                 const fiveMin = endTime.clone().subtract(5, 'minutes').format('HH:mm');
                 const readingDisplay = document.getElementById(`noReading${index}`).checked ? "N/A" : `${startTime.format('HH:mm')} - ${examStartTime.format('HH:mm')}`;
+
                 document.getElementById(`readingTimeDisplay${index}`).textContent = readingDisplay;
                 document.getElementById(`thirtyMin${index}`).textContent = thirtyMin;
                 document.getElementById(`fiveMin${index}`).textContent = fiveMin;
                 document.getElementById(`endTime${index}`).textContent = endTime.format('HH:mm');
-                calculateAccommodations(index);
                 document.getElementById(`readingTimeDisplay${index}`).dataset.start = startTime.format('HH:mm');
                 document.getElementById(`readingTimeDisplay${index}`).dataset.end = examStartTime.format('HH:mm');
-                document.getElementById(`endTime${index}`).dataset.accommodationEnd = document.getElementById(`accommodationEndTime${index}`).innerText || endTime.format('HH:mm');
-            }
-        }
-
-        function calculateAccommodations(index) {
-            const endTime = document.getElementById(`endTime${index}`).innerText;
-            const accommodationsCheckbox = document.getElementById(`noAccommodations${index}`);
-            const accommodations = parseInt(document.getElementById(`accommodations${index}`).value);
-            const accommodationEndTime = document.getElementById(`accommodationEndTime${index}`);
-            if (accommodationsCheckbox.checked) {
-                accommodationEndTime.textContent = '';
-            } else if (endTime && accommodations > 0) {
-                const endMoment = moment(endTime, 'HH:mm');
-                const durationMinutes = (parseInt(document.getElementById(`durationHours${index}`).value) * 60) + parseInt(document.getElementById(`durationMinutes${index}`).value);
-                const additionalTime = durationMinutes * (accommodations / 100);
-                accommodationEndTime.textContent = endMoment.clone().add(additionalTime, 'minutes').format('HH:mm');
-            } else {
-                accommodationEndTime.textContent = 'N/A';
+                document.getElementById(`endTime${index}`).dataset.accommodationEnd = document.getElementById(`endTime${index}`).innerText || endTime.format('HH:mm');
             }
         }
 
@@ -453,6 +454,10 @@
                 }).join('') +
                 `</tr>
                             <tr>
+                                <td class="sticky-col sticky-col-content">Accommodations (%)</td>` +
+                Array.from({ length: numberOfExams }, (_, i) => `<td>${document.getElementById(`noAccommodations${i + 1}`).checked ? "N/A" : document.getElementById(`accommodations${i + 1}`).value + "%"}</td>`).join('') +
+                `</tr>
+                            <tr>
                                 <td class="sticky-col sticky-col-content">Reading Time Allocated</td>` +
                 Array.from({ length: numberOfExams }, (_, i) => `<td>${document.getElementById(`noReading${i + 1}`).checked ? "N/A" : document.getElementById(`readingTime${i + 1}`).value + " mins"}</td>`).join('') +
                 `</tr>
@@ -475,10 +480,6 @@
                             <tr>
                                 <td class="sticky-col sticky-col-content">End</td>` +
                 Array.from({ length: numberOfExams }, (_, i) => `<td id='endTime${i + 1}Cell'>${document.getElementById(`endTime${i + 1}`).textContent}</td>`).join('') +
-                `</tr>
-                            <tr>
-                                <td class="sticky-col sticky-col-content">Accommodations (%)</td>` +
-                Array.from({ length: numberOfExams }, (_, i) => `<td id='accommodation${i + 1}Cell'>${document.getElementById(`noAccommodations${i + 1}`).checked ? "N/A" : document.getElementById(`accommodationEndTime${i + 1}`).innerText}</td>`).join('') +
                 `</tr>
                         </tbody>
                     </table>
@@ -544,7 +545,7 @@
 
         function exportToExcel() {
             const examDate = document.getElementById("examDate").value || 'Set Exam Date';
-            const headers = ["Exam Duration", "Reading Time Allocated", "Start Time", "Reading Period", "30 Mins Remaining", "5 Mins Remaining", "End", "Accommodations (%)"];
+            const headers = ["Exam Duration", "Accommodations (%)", "Reading Time Allocated", "Start Time", "Reading Period", "30 Mins Remaining", "5 Mins Remaining", "End"];
             const data = [
                 [examDate, ...Array.from(document.querySelector("table").rows[0].cells).slice(1).map(cell => cell.innerText.trim())]
             ];
@@ -560,21 +561,21 @@
                                 const minutes = document.getElementById(`durationMinutes${j}`).value;
                                 return `${hours > 0 ? hours + (hours == 1 ? ' hr ' : ' hrs ') : ''}${minutes > 0 ? minutes + ' mins' : ''}`;
                             case 1:
-                                return document.getElementById(`noReading${j}`).checked ? "N/A" : document.getElementById(`readingTime${j}`).value + " mins";
+                                return document.getElementById(`noAccommodations${j}`).checked ? "N/A" : document.getElementById(`accommodations${j}`).value + "%";
                             case 2:
-                                return moment(document.getElementById(`startTime${j}`).value, 'HH:mm').format('HH:mm');
+                                return document.getElementById(`noReading${j}`).checked ? "N/A" : document.getElementById(`readingTime${j}`).value + " mins";
                             case 3:
+                                return moment(document.getElementById(`startTime${j}`).value, 'HH:mm').format('HH:mm');
+                            case 4:
                                 const startDisplay = moment(document.getElementById(`startTime${j}`).value, 'HH:mm').format('HH:mm');
                                 const endDisplay = moment(document.getElementById(`startTime${j}`).value, 'HH:mm').add(parseInt(document.getElementById(`readingTime${j}`).value), 'minutes').format('HH:mm');
                                 return document.getElementById(`noReading${j}`).checked ? "N/A" : `${startDisplay} - ${endDisplay}`;
-                            case 4:
-                                return moment(document.getElementById(`thirtyMin${j}`).textContent, 'HH:mm').format('HH:mm');
                             case 5:
-                                return moment(document.getElementById(`fiveMin${j}`).textContent, 'HH:mm').format('HH:mm');
+                                return moment(document.getElementById(`thirtyMin${j}`).textContent, 'HH:mm').format('HH:mm');
                             case 6:
-                                return moment(document.getElementById(`endTime${j}`).textContent, 'HH:mm').format('HH:mm');
+                                return moment(document.getElementById(`fiveMin${j}`).textContent, 'HH:mm').format('HH:mm');
                             case 7:
-                                return document.getElementById(`noAccommodations${j}`).checked ? "N/A" : moment(document.getElementById(`accommodationEndTime${j}`).innerText, 'HH:mm').format('HH:mm');
+                                return moment(document.getElementById(`endTime${j}`).textContent, 'HH:mm').format('HH:mm');
                         }
                     })();
                     row.push(value);
@@ -588,8 +589,8 @@
             data[0].forEach((_, c) => {
                 data.forEach((_, r) => {
                     const cellAddress = XLSX.utils.encode_cell({ r, c });
-                    if (!worksheet[cellAddress].s) worksheet[cellAddress].s = {};
-                    worksheet[cellAddress].s.fill = { patternType: 'solid', fgColor: { rgb: ['FFFFFF', 'D3D3D3'][c % 2] } };
+                    if (!worksheet[cellAddress].s) worksheet[cellAddress.s] = {};
+                    worksheet[cellAddress.s.fill] = { patternType: 'solid', fgColor: { rgb: ['FFFFFF', 'D3D3D3'][c % 2] } };
                 });
             });
 
@@ -690,11 +691,10 @@
             accommodationsInput.disabled = accommodationsCheckbox.checked;
             if (accommodationsCheckbox.checked) {
                 accommodationsInput.value = 0;
-                document.getElementById(`accommodationEndTime${index}`).textContent = '';
             } else {
                 accommodationsInput.value = '';
             }
-            calculateAccommodations(index);
+            calculateTimes(index);
         }
 
         function clearPlaceholder(element) {
@@ -722,7 +722,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="examDate" class="form-label">What is the date you are scheduling the exams for?</label>
-                        <input type="date" id="examDate" class="form-control mb-3" aria-label="Exam Date">
+                        <input type="date" id="examDate" class="form-control mb-3" aria-label="Exam Date" placeholder="Select Exam Date">
                     </div>
                     <div class="form-group col-md-6">
                         <label for="numExams" class="form-label">How many exams are being scheduled for the given day?</label>
@@ -738,7 +738,7 @@
     <div id="finalizedView" class="container-fluid">
         <div class="card">
             <div class="card-body">
-                <button class="btn btn-secondary mb-3" onclick="showScheduleView()">Return to Scheduling</button>
+                <button class="btn btn-secondary btn-small mb-3" onclick="showScheduleView()">Return to Scheduling</button>
                 <div id="clockArea" class="mb-5"></div>
                 <div id="finalizedTableArea" class="mt-5"></div>
             </div>
