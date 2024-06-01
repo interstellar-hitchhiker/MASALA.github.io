@@ -1,15 +1,3 @@
-### License Explanation
-
-The MIT License is a permissive free software license. It allows users to do almost anything they want with the project, like making and distributing closed-source versions. The only restriction is that the original copyright and license notice must be included in all copies or substantial portions of the software.
-
-Given your requirements to prevent commercial use and incorporation into paid apps or sites, the MIT License may not be the best choice. Instead, you might consider the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** license, which allows others to remix, adapt, and build upon your work non-commercially, and although their new works must also acknowledge you and be non-commercial, they don’t have to license their derivative works on the same terms.
-
-### Updated README
-
-Here is the updated README file formatted for GitHub with the appropriate license and information:
-
----
-
 # MASALA.github.io
 Exam Schedule Creator and Display 
 https://interstellar-hitchhiker.github.io/MASALA/
